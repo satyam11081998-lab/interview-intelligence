@@ -11,7 +11,7 @@ services:
     runtime: python
     region: singapore
     plan: starter
-    autoDeploy: false
+    autoDeploy: true
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn interview_intelligence.main:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers
     healthCheckPath: /healthz
@@ -20,6 +20,8 @@ services:
         value: prod
       - key: II_WORKER_THREADS
         value: "2"
+      # Supabase -> Connect -> "Session pooler" URI (IPv4; Render cannot reach the IPv6-only direct host),
+      # with the user changed from postgres.<ref> to ii_service.<ref> and the ii_service password.
       - key: II_DATABASE_URL
         sync: false
       - key: II_ASSERTION_PUBLIC_KEY
@@ -33,7 +35,7 @@ services:
       - key: II_BOOTSTRAP_TEST_EMAILS
         sync: false
       - key: II_CORS_ORIGINS
-        value: https://mece.in,https://www.mece.in
+        value: https://mece.in,https://www.mece.in,https://consilioo.vercel.app
       - key: II_OPENAI_API_KEY
         sync: false
       - key: II_ANTHROPIC_API_KEY
