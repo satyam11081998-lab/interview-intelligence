@@ -1,0 +1,58 @@
+# Interview Intelligence — its own Render web service (separate from consilio-backend so the
+# existing 512 MB box is not shared; see docs/A_ARCHITECTURE.md §4).
+#
+# Region: Singapore is closer than Oregon to both the Supabase project (Tokyo) and most MECE
+# users (India); the live interview does one database transaction per turn, so this matters.
+# Python: tested on 3.13 (Render's current default); pin PYTHON_VERSION in the dashboard if needed.
+# Secrets are `sync: false` — set them in the Render dashboard, never in this file.
+services:
+  - type: web
+    name: mece-interview-intelligence
+    runtime: python
+    region: singapore
+    plan: starter
+    autoDeploy: false
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn interview_intelligence.main:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers
+    healthCheckPath: /healthz
+    envVars:
+      - key: II_ENV
+        value: prod
+      - key: II_WORKER_THREADS
+        value: "2"
+      - key: II_DATABASE_URL
+        sync: false
+      - key: II_ASSERTION_PUBLIC_KEY
+        sync: false
+      - key: II_ASSERTION_KID
+        value: k1
+      - key: II_ENCRYPTION_KEY
+        sync: false
+      - key: II_ADMIN_EMAILS
+        sync: false
+      - key: II_BOOTSTRAP_TEST_EMAILS
+        sync: false
+      - key: II_CORS_ORIGINS
+        value: https://mece.in,https://www.mece.in
+      - key: II_OPENAI_API_KEY
+        sync: false
+      - key: II_ANTHROPIC_API_KEY
+        sync: false
+      - key: II_GROQ_API_KEY
+        sync: false
+      - key: II_GEMINI_API_KEY
+        sync: false
+      - key: II_GDRIVE_ROOT_FOLDER_ID
+        sync: false
+      - key: II_GDRIVE_CLIENT_ID
+        sync: false
+      - key: II_GDRIVE_CLIENT_SECRET
+        sync: false
+      - key: II_GDRIVE_REFRESH_TOKEN
+        sync: false
+      - key: II_DRIVE_FOLDER_SALT
+        sync: false
+      - key: II_DAILY_BUDGET_USD
+        value: "25"
+      - key: II_SESSION_COST_CAP_USD
+        value: "1.50"
